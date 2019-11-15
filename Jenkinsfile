@@ -42,7 +42,9 @@ podTemplate(
         def repository
         stage ('Docker') {
             container ('docker') {
-                repository = "hello"
+                def registryIp = sh(script: 'getent hosts registry.kube-system | awk \'{ print $1 ; exit }\'', returnStdout: true).trim()
+                echo "${registryIp}"
+                repository = "${registryIp}:80/hello"
                 sh "docker build -t ${repository}:${commitId} ."
                 sh "docker push ${repository}:${commitId}"
             }
